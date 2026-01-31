@@ -1,0 +1,8 @@
+
+{
+  "name": "VOX-INTELLIGENCE-PRO",
+  "description": "Plataforma de auditoría y análisis de autenticidad de voz basada en IA.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

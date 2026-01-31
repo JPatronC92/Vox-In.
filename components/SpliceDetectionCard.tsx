@@ -1,0 +1,70 @@
+import React from 'react';
+import { Scissors, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Language } from '../types';
+
+interface Props {
+    cutsDetected: number;
+    timestamps: number[];
+    lang: Language;
+}
+
+const translations = {
+    es: {
+        title: "Detección de Edición",
+        noCuts: "Sin cortes detectados",
+        cutsFound: "cortes detectados",
+        atSecond: "en segundo",
+        clean: "Audio limpio",
+        warning: "Posible manipulación",
+    },
+    en: {
+        title: "Splice Detection",
+        noCuts: "No cuts detected",
+        cutsFound: "cuts detected",
+        atSecond: "at second",
+        clean: "Clean audio",
+        warning: "Possible manipulation",
+    }
+};
+
+const SpliceDetectionCard: React.FC<Props> = ({ cutsDetected, timestamps, lang }) => {
+    const t = translations[lang];
+    const hasEdits = cutsDetected > 0;
+
+    return (
+        <section className={`enterprise-panel rounded-2xl overflow-hidden border ${hasEdits ? 'border-amber-500/30' : 'border-brand-500/30'}`}>
+            <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${hasEdits ? 'bg-amber-500/10' : 'bg-brand-500/10'}`}>
+                        <Scissors size={20} className={hasEdits ? 'text-amber-400' : 'text-brand-500'} />
+                    </div>
+                    <div>
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">{t.title}</h3>
+                        <p className={`text-sm font-bold ${hasEdits ? 'text-amber-400' : 'text-brand-500'}`}>
+                            {hasEdits ? `${cutsDetected} ${t.cutsFound}` : t.noCuts}
+                        </p>
+                    </div>
+                </div>
+                {hasEdits ? (
+                    <AlertTriangle size={24} className="text-amber-400" />
+                ) : (
+                    <CheckCircle size={24} className="text-brand-500" />
+                )}
+            </div>
+
+            {hasEdits && timestamps.length > 0 && (
+                <div className="px-4 pb-4">
+                    <div className="flex flex-wrap gap-2">
+                        {timestamps.map((ts, idx) => (
+                            <span key={idx} className="px-2 py-1 bg-amber-500/10 text-amber-400 rounded-full text-[10px] font-mono">
+                                {ts.toFixed(2)}s
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </section>
+    );
+};
+
+export default SpliceDetectionCard;
