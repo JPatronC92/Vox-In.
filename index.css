@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* Custom theme extension */
+@theme {
+  --font-mono: "JetBrains Mono", monospace;
+  --font-sans: "Inter", sans-serif;
+
+  --color-brand-50: #ecfdf5;
+  --color-brand-100: #d1fae5;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-900: #064e3b;
+
+  --color-deep-900: #0f172a;
+  --color-deep-950: #080c14;
+}
+
+/* Custom styles */
+body {
+  background-color: var(--color-deep-950);
+  color: #e2e8f0;
+  overscroll-behavior: none;
+  overflow: hidden;
+  font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+}
+
+.enterprise-panel {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-blur {
+  background: rgba(8, 12, 20, 0.85);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-brand-500) 0%, var(--color-brand-600) 100%);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.cyber-grid {
+  background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
