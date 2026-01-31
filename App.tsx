@@ -31,6 +31,10 @@ import TranscriptionCard from './components/TranscriptionCard';
 import MetadataCard from './components/MetadataCard';
 import SpeakerProfilesCard from './components/SpeakerProfilesCard';
 import SpliceDetectionCard from './components/SpliceDetectionCard';
+import OnboardingBYOK from './components/OnboardingBYOK';
+
+// Check if running in Tauri
+const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
 
 const translations = {
   es: {
@@ -112,12 +116,46 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('vox_lang');
     return (saved as Language) || 'es';
   });
+  const [hasApiKey, setHasApiKey] = useState<boolean | null>(null);
 
   const t = translations[lang];
+
+  // Check for API key on mount
+  useEffect(() => {
+    const checkApiKey = async () => {
+      if (isTauri) {
+        try {
+          const { invoke } = await import('@tauri-apps/api/core');
+          const key = await invoke<string | null>('get_api_key');
+          setHasApiKey(!!key);
+        } catch {
+          setHasApiKey(false);
+        }
+      } else {
+        // Web mode: check localStorage
+        const key = localStorage.getItem('gemini_api_key');
+        setHasApiKey(!!key);
+      }
+    };
+    checkApiKey();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('vox_lang', lang);
   }, [lang]);
+
+  // Show onboarding if no API key
+  if (hasApiKey === null) {
+    return (
+      <div className="min-h-screen bg-deep-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-brand-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!hasApiKey) {
+    return <OnboardingBYOK onComplete={() => setHasApiKey(true)} language={lang} />;
+  }
 
   const [activeTab, setActiveTab] = useState<string>('AUDIO');
   const [status, setStatus] = useState<AnalysisStatus>('INACTIVO');

@@ -31,3 +31,7 @@ base64 = "0.22"
 reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
 tokio = { version = "1", features = ["full"] }
 
+# Secure storage for BYOK
+tauri-plugin-store = "2"
+
+
