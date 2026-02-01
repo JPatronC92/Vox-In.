@@ -20,7 +20,8 @@ import {
   Globe
 } from 'lucide-react';
 import { ForensicReport, AnalysisStatus, Language } from './types';
-import { analyzeVoiceNote, transcribeAudio } from './geminiService';
+import { analyzeVoiceNote, transcribeAudio } from './services/geminiService';
+import { translations } from './i18n/translations';
 import WaveformVisualizer from './components/WaveformVisualizer';
 import Spectrogram from './components/Spectrogram';
 import AnalysisCard from './components/AnalysisCard';
@@ -35,81 +36,6 @@ import OnboardingBYOK from './components/OnboardingBYOK';
 
 // Check if running in Tauri
 const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
-
-const translations = {
-  es: {
-    unit: "UNIDAD DE INTELIGENCIA",
-    systemStatus: "Estado del Sistema",
-    encrypted: "ENLACE_CIFRADO_ON",
-    tabAudio: "Audio",
-    tabVisual: "Visual",
-    tabReport: "Informe",
-    audioSource: "Fuente de Audio",
-    record: "Grabar",
-    stop: "Detener",
-    upload: "Cargar",
-    file: "ARCHIVO",
-    transcriptionTitle: "Transcripción Automática",
-    transcriptionProcessing: "Analizando contenido verbal...",
-    auditBtn: "INICIAR AUDITORÍA IA",
-    auditProcessing: "PROCESANDO...",
-    consoleTitle: "Consola de Operaciones",
-    monitorWave: "MONITOR DE ONDA",
-    monitorSpectral: "CALOR ESPECTRAL",
-    analyzeSegment: "Analizar Fragmento",
-    resultReport: "Informe de Autenticidad",
-    resultVerdict: "NIVEL",
-    resultScore: "PUNTUACIÓN",
-    profileTitle: "Perfil de Voz",
-    profileAge: "Edad Estimada",
-    profileGender: "Género",
-    envTitle: "Entorno",
-    envSpace: "Espacio Probable",
-    envMarkers: "Marcadores Sonoros",
-    envClean: "Limpio",
-    noData: "Esperando datos",
-    okLoad: "Archivo cargado correctamente.",
-    errMic: "No se pudo acceder al micrófono.",
-    analysisStart: "Iniciando diagnóstico...",
-    analysisEnd: "Análisis finalizado."
-  },
-  en: {
-    unit: "INTELLIGENCE UNIT",
-    systemStatus: "System Status",
-    encrypted: "ENCRYPTED_LINK_ON",
-    tabAudio: "Audio",
-    tabVisual: "Visual",
-    tabReport: "Report",
-    audioSource: "Audio Source",
-    record: "Record",
-    stop: "Stop",
-    upload: "Upload",
-    file: "FILE",
-    transcriptionTitle: "Automatic Transcription",
-    transcriptionProcessing: "Analyzing verbal content...",
-    auditBtn: "START AI AUDIT",
-    auditProcessing: "PROCESSING...",
-    consoleTitle: "Operations Console",
-    monitorWave: "WAVE MONITOR",
-    monitorSpectral: "SPECTRAL HEATMAP",
-    analyzeSegment: "Analyze Fragment",
-    resultReport: "Authenticity Report",
-    resultVerdict: "LEVEL",
-    resultScore: "SCORE",
-    profileTitle: "Voice Profile",
-    profileAge: "Estimated Age",
-    profileGender: "Gender",
-    envTitle: "Environment",
-    envSpace: "Probable Space",
-    envMarkers: "Audio Markers",
-    envClean: "Clean",
-    noData: "Waiting for data",
-    okLoad: "File loaded successfully.",
-    errMic: "Microphone access denied.",
-    analysisStart: "Starting diagnostic...",
-    analysisEnd: "Analysis complete."
-  }
-};
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>(() => {
