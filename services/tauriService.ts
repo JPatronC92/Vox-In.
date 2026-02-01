@@ -1,9 +1,9 @@
 /**
  * Tauri bridge service for invoking Rust commands
- * Falls back to web-only mode when not running in Tauri
+ * All Gemini API calls go through secure Rust backend
  */
 
-import { ForensicReport, Language } from './types';
+import { ForensicReport, Language } from '../types';
 
 // Check if running inside Tauri
 const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
@@ -24,24 +24,23 @@ interface LocalAnalysis {
 }
 
 /**
- * Invoke a Tauri command if available
+ * Invoke a Tauri command
  */
 async function invokeTauri<T>(cmd: string, args: Record<string, unknown>): Promise<T> {
     if (!isTauri) {
-        throw new Error('Not running in Tauri environment');
+        throw new Error('Tauri environment required. This app only runs via Tauri.');
     }
-    // @ts-ignore - Tauri global
     const { invoke } = await import('@tauri-apps/api/core');
     return invoke(cmd, args);
 }
 
 /**
  * Analyze audio locally using Rust (fast, free, offline)
- * Only works for WAV format in Tauri environment
+ * Only works for WAV format
  */
 export async function analyzeAudioLocal(audioBase64: string): Promise<LocalAnalysis | null> {
     if (!isTauri) {
-        console.log('Local analysis not available in web mode');
+        console.warn('Local analysis not available outside Tauri');
         return null;
     }
 
@@ -56,39 +55,42 @@ export async function analyzeAudioLocal(audioBase64: string): Promise<LocalAnaly
 }
 
 /**
- * Analyze audio with Gemini AI via secure Rust backend
+ * Transcribe audio using Gemini via secure Rust backend
  */
-export async function analyzeWithGemini(
+export async function transcribeAudio(
     audioBase64: string,
     mimeType: string,
     language: Language
-): Promise<ForensicReport> {
-    if (isTauri) {
-        // Use secure Rust backend
-        const response = await invokeTauri<string>('analyze_with_gemini', {
-            audioBase64,
-            mimeType,
-            language
-        });
-
-        // Parse Gemini response
-        const parsed = JSON.parse(response);
-        const candidates = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (candidates) {
-            return JSON.parse(candidates);
-        }
-        throw new Error('Invalid Gemini response structure');
-    } else {
-        // Fallback to direct API call (less secure, web-only)
-        const { analyzeVoiceNote } = await import('./geminiService');
-        return analyzeVoiceNote(audioBase64, mimeType, language);
-    }
+): Promise<string> {
+    return invokeTauri<string>('transcribe_audio', {
+        audioBase64,
+        mimeType,
+        language
+    });
 }
 
 /**
- * Check if hybrid mode is available (Tauri + Rust)
+ * Full forensic analysis using Gemini via secure Rust backend
  */
-export function isHybridModeAvailable(): boolean {
+export async function analyzeVoiceNote(
+    audioBase64: string,
+    mimeType: string,
+    language: Language,
+    segment?: { start: number; end: number }
+): Promise<ForensicReport> {
+    return invokeTauri<ForensicReport>('analyze_full', {
+        audioBase64,
+        mimeType,
+        language,
+        segmentStart: segment?.start ?? null,
+        segmentEnd: segment?.end ?? null
+    });
+}
+
+/**
+ * Check if running in Tauri environment
+ */
+export function isTauriEnvironment(): boolean {
     return isTauri;
 }
 
@@ -98,7 +100,39 @@ export function isHybridModeAvailable(): boolean {
 export function getEnvironmentInfo() {
     return {
         isTauri,
-        platform: isTauri ? 'desktop' : 'web',
+        platform: isTauri ? 'native' : 'web',
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
     };
+}
+
+/**
+ * Listen for shared files (Share Intent on Android/iOS)
+ */
+export async function listenForSharedFiles(
+    callback: (urls: string[]) => void
+): Promise<() => void> {
+    if (!isTauri) {
+        console.warn('Share intent listening not available outside Tauri');
+        return () => { };
+    }
+
+    try {
+        const { onOpenUrl, getCurrent } = await import('@tauri-apps/plugin-deep-link');
+
+        // Check if app was opened with a URL
+        const initialUrls = await getCurrent();
+        if (initialUrls && initialUrls.length > 0) {
+            callback(initialUrls);
+        }
+
+        // Listen for future URLs
+        const unlisten = await onOpenUrl((urls) => {
+            callback(urls);
+        });
+
+        return unlisten;
+    } catch (error) {
+        console.error('Failed to setup share intent listener:', error);
+        return () => { };
+    }
 }

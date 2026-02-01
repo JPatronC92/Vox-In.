@@ -20,7 +20,7 @@ import {
   Globe
 } from 'lucide-react';
 import { ForensicReport, AnalysisStatus, Language } from './types';
-import { analyzeVoiceNote, transcribeAudio } from './services/geminiService';
+import { analyzeVoiceNote, transcribeAudio, listenForSharedFiles, isTauriEnvironment } from './services/tauriService';
 import { translations } from './i18n/translations';
 import WaveformVisualizer from './components/WaveformVisualizer';
 import Spectrogram from './components/Spectrogram';
@@ -35,16 +35,39 @@ import SpliceDetectionCard from './components/SpliceDetectionCard';
 import OnboardingBYOK from './components/OnboardingBYOK';
 
 // Check if running in Tauri
-const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
+const isTauri = isTauriEnvironment();
 
 const App: React.FC = () => {
+  // ALL HOOKS MUST BE AT THE TOP - before any conditional returns
   const [lang, setLang] = useState<Language>(() => {
     const saved = localStorage.getItem('vox_lang');
     return (saved as Language) || 'es';
   });
   const [hasApiKey, setHasApiKey] = useState<boolean | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('AUDIO');
+  const [status, setStatus] = useState<AnalysisStatus>('INACTIVO');
+  const [report, setReport] = useState<ForensicReport | null>(null);
+  const [preTranscription, setPreTranscription] = useState<string | null>(null);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [currentBase64, setCurrentBase64] = useState<string | null>(null);
+  const [mimeType, setMimeType] = useState<string>('audio/mpeg');
+  const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
+  const [fileHash, setFileHash] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
 
   const t = translations[lang];
+
+  const addLog = useCallback((msg: string, isError = false) => {
+    setLogs(prev => [`${isError ? 'ERR' : 'OK'} // ${msg}`, ...prev].slice(0, 30));
+  }, []);
 
   // Check for API key on mount
   useEffect(() => {
@@ -70,6 +93,40 @@ const App: React.FC = () => {
     localStorage.setItem('vox_lang', lang);
   }, [lang]);
 
+  // Listen for Share Intent (files shared from other apps) - mobile only
+  useEffect(() => {
+    if (!isTauri) return;
+
+    let unlisten: (() => void) | null = null;
+
+    const setupListener = async () => {
+      try {
+        unlisten = await listenForSharedFiles(async (urls) => {
+          console.log('Received shared files:', urls);
+          // Process the first audio URL
+          if (urls.length > 0) {
+            try {
+              const response = await fetch(urls[0]);
+              const blob = await response.blob();
+              window.dispatchEvent(new CustomEvent('shared-audio', { detail: blob }));
+            } catch (error) {
+              console.error('Failed to fetch shared file:', error);
+            }
+          }
+        });
+      } catch (error) {
+        // Share intent not available on desktop - this is expected
+        console.log('Share intent not available (desktop mode):', error);
+      }
+    };
+
+    setupListener();
+
+    return () => {
+      if (unlisten) unlisten();
+    };
+  }, []);
+
   // Show onboarding if no API key
   if (hasApiKey === null) {
     return (
@@ -83,28 +140,7 @@ const App: React.FC = () => {
     return <OnboardingBYOK onComplete={() => setHasApiKey(true)} language={lang} />;
   }
 
-  const [activeTab, setActiveTab] = useState<string>('AUDIO');
-  const [status, setStatus] = useState<AnalysisStatus>('INACTIVO');
-  const [report, setReport] = useState<ForensicReport | null>(null);
-  const [preTranscription, setPreTranscription] = useState<string | null>(null);
-  const [isTranscribing, setIsTranscribing] = useState(false);
-  const [logs, setLogs] = useState<string[]>([]);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [currentBase64, setCurrentBase64] = useState<string | null>(null);
-  const [mimeType, setMimeType] = useState<string>('audio/mpeg');
-  const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
-  const [fileHash, setFileHash] = useState<string | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0);
-
-  const addLog = useCallback((msg: string, isError = false) => {
-    setLogs(prev => [`${isError ? 'ERR' : 'OK'} // ${msg}`, ...prev].slice(0, 30));
-  }, []);
+  // Main app content starts here (after all hooks and conditional returns)
 
   const performASR = async (base64: string, type: string) => {
     setIsTranscribing(true);

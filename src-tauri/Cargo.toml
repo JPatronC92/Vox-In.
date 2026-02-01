@@ -34,4 +34,5 @@ tokio = { version = "1", features = ["full"] }
 # Secure storage for BYOK
 tauri-plugin-store = "2"
 
-
+# Deep link for Share Intent handling
+tauri-plugin-deep-link = "2"
