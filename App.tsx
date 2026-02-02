@@ -1,9 +1,6 @@
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  ShieldCheck,
   Activity,
-  Upload,
   Fingerprint,
   Database,
   FileAudio,
@@ -20,7 +17,7 @@ import {
   Globe
 } from 'lucide-react';
 import { ForensicReport, AnalysisStatus, Language } from './types';
-import { analyzeVoiceNote, transcribeAudio, listenForSharedFiles, isTauriEnvironment } from './services/tauriService';
+import { analyzeVoiceNote, transcribeAudio, listenForSharedFiles, isTauriEnvironment, resetApiKey } from './services/tauriService';
 import { translations } from './i18n/translations';
 import WaveformVisualizer from './components/WaveformVisualizer';
 import Spectrogram from './components/Spectrogram';
@@ -33,6 +30,8 @@ import MetadataCard from './components/MetadataCard';
 import SpeakerProfilesCard from './components/SpeakerProfilesCard';
 import SpliceDetectionCard from './components/SpliceDetectionCard';
 import OnboardingBYOK from './components/OnboardingBYOK';
+import Header from './components/Header';
+import FileUploader from './components/FileUploader';
 
 // Check if running in Tauri
 const isTauri = isTauriEnvironment();
@@ -78,12 +77,10 @@ const App: React.FC = () => {
           const key = await invoke<string | null>('get_api_key');
           setHasApiKey(!!key);
         } catch {
-          setHasApiKey(false);
+          setHasApiKey(false); // Fallback for web dev
         }
       } else {
-        // Web mode: check localStorage
-        const key = localStorage.getItem('gemini_api_key');
-        setHasApiKey(!!key);
+        setHasApiKey(true); // Web dev mode
       }
     };
     checkApiKey();
@@ -93,7 +90,7 @@ const App: React.FC = () => {
     localStorage.setItem('vox_lang', lang);
   }, [lang]);
 
-  // Listen for Share Intent (files shared from other apps) - mobile only
+  // Listen for shared intents (Deep Linking)
   useEffect(() => {
     if (!isTauri) return;
 
@@ -126,6 +123,14 @@ const App: React.FC = () => {
       if (unlisten) unlisten();
     };
   }, []);
+
+  const handleResetApiKey = async () => {
+    if (confirm(lang === 'es' ? '¿Eliminar API Key y salir?' : 'Delete API Key and Logout?')) {
+      await resetApiKey();
+      setHasApiKey(false);
+      window.location.reload();
+    }
+  };
 
   // Show onboarding if no API key
   if (hasApiKey === null) {
@@ -179,21 +184,24 @@ const App: React.FC = () => {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = recorder;
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
-      recorder.ondataavailable = (e) => chunksRef.current.push(e.data);
-      recorder.onstop = async () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm;codecs=opus' });
-        await processAudioSource(blob);
-        setStatus('INACTIVO');
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
       };
-      recorder.start();
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        processAudioSource(blob);
+      };
+
+      mediaRecorder.start();
       setIsRecording(true);
-      setStatus('ANALIZANDO');
-      addLog(lang === 'es' ? "Capturando..." : "Capturing...");
     } catch (err) {
-      addLog(t.errMic, true);
+      console.error('Error accessing microphone:', err);
+      addLog(t.micError, true);
     }
   };
 
@@ -224,44 +232,23 @@ const App: React.FC = () => {
     <div className="flex flex-col h-screen bg-deep-950 text-slate-300 font-sans overflow-hidden">
       <div className="fixed inset-0 cyber-grid pointer-events-none"></div>
 
-      {/* ENTERPRISE HEADER */}
-      <header className="px-6 py-4 nav-blur border-b border-white/5 flex items-center justify-between z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center shadow-lg shadow-brand-500/20">
-            <ShieldCheck className="w-5 h-5 text-deep-950" />
-          </div>
-          <div>
-            <h1 className="text-sm font-extrabold tracking-tight text-white leading-none">VOX INTELLIGENCE</h1>
-            <p className="text-[9px] font-bold text-brand-500 tracking-[0.2em] mt-1">{t.unit}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {/* LANG SELECTOR */}
-          <div className="flex bg-white/5 p-1 rounded-lg border border-white/5">
-            <button onClick={() => setLang('es')} className={`px-2 py-1 text-[9px] font-black rounded transition-all ${lang === 'es' ? 'bg-brand-500 text-deep-950' : 'text-slate-500'}`}>ES</button>
-            <button onClick={() => setLang('en')} className={`px-2 py-1 text-[9px] font-black rounded transition-all ${lang === 'en' ? 'bg-brand-500 text-deep-950' : 'text-slate-500'}`}>EN</button>
-          </div>
-
-          <div className="hidden md:flex flex-col items-end mr-2">
-            <span className="text-[10px] text-slate-500 font-bold uppercase">{t.systemStatus}</span>
-            <span className="text-[10px] text-brand-500 font-mono">{t.encrypted}</span>
-          </div>
-          <div className="px-3 py-1 rounded-full border border-white/5 bg-white/5 flex items-center gap-2">
-            <div className={`w-1.5 h-1.5 rounded-full ${status === 'ANALIZANDO' || isTranscribing ? 'bg-amber-400 animate-pulse' : 'bg-brand-500'}`}></div>
-            <span className="text-[10px] font-bold text-white uppercase">{isTranscribing ? (lang === 'es' ? 'PROCESANDO' : 'PROCESSING') : status}</span>
-          </div>
-        </div>
-      </header>
+      <Header
+        lang={lang}
+        setLang={setLang}
+        t={t}
+        status={status}
+        isTranscribing={isTranscribing}
+        onResetApiKey={handleResetApiKey}
+      />
 
       <audio ref={audioRef} src={audioUrl || ''} onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)} onPlay={() => setIsPlaying(true)} onPause={() => setIsPlaying(false)} />
 
-      <main className="flex-1 overflow-y-auto p-4 pb-32 z-10">
-        <div className="max-w-xl mx-auto space-y-5">
+      <main className="flex-1 overflow-y-auto p-3 md:p-4 pb-32 z-10 w-full">
+        <div className="max-w-xl mx-auto space-y-4 md:space-y-5">
 
           {activeTab === 'AUDIO' && (
-            <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <section className="enterprise-panel p-6 rounded-3xl shadow-2xl">
+            <div className="space-y-4 md:space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <section className="enterprise-panel p-4 md:p-6 rounded-3xl shadow-2xl">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
                     <Database size={16} className="text-brand-500" /> {t.audioSource}
@@ -272,7 +259,7 @@ const App: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <button
                     onClick={isRecording ? stopRecording : startRecording}
-                    className={`flex flex-col items-center justify-center p-8 rounded-2xl border-2 transition-all active:scale-95 ${isRecording ? 'bg-rose-500/10 border-rose-500 text-rose-500' : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'}`}
+                    className={`flex flex-col items-center justify-center p-6 md:p-8 rounded-2xl border-2 transition-all active:scale-95 ${isRecording ? 'bg-rose-500/10 border-rose-500 text-rose-500' : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'}`}
                   >
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${isRecording ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-800'}`}>
                       {isRecording ? <Square fill="currentColor" size={20} /> : <Mic size={24} />}
@@ -280,16 +267,11 @@ const App: React.FC = () => {
                     <span className="text-[10px] font-extrabold uppercase tracking-widest">{isRecording ? t.stop : t.record}</span>
                   </button>
 
-                  <label className="flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 active:scale-95 transition-all cursor-pointer">
-                    <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mb-3">
-                      <Upload size={24} />
-                    </div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-widest">{t.upload}</span>
-                    <input type="file" className="hidden" accept="audio/*" onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) processAudioSource(file);
-                    }} />
-                  </label>
+                  <FileUploader
+                    isTauri={isTauri}
+                    onFileSelected={processAudioSource}
+                    label={t.upload}
+                  />
                 </div>
 
                 {audioUrl && (

@@ -36,3 +36,5 @@ tauri-plugin-store = "2"
 
 # Deep link for Share Intent handling
 tauri-plugin-deep-link = "2"
+tauri-plugin-dialog = "2.6.0"
+tauri-plugin-fs = "2.4.5"

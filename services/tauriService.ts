@@ -88,6 +88,17 @@ export async function analyzeVoiceNote(
 }
 
 /**
+ * Reset API Key (delete from secure storage)
+ */
+export async function resetApiKey(): Promise<void> {
+    return invokeTauri('delete_api_key', {});
+}
+
+export async function checkApiKey(): Promise<string | null> {
+    return invokeTauri('get_api_key', {});
+}
+
+/**
  * Check if running in Tauri environment
  */
 export function isTauriEnvironment(): boolean {
@@ -112,7 +123,7 @@ export async function listenForSharedFiles(
     callback: (urls: string[]) => void
 ): Promise<() => void> {
     if (!isTauri) {
-        console.warn('Share intent listening not available outside Tauri');
+        // console.warn('Share intent listening not available outside Tauri');
         return () => { };
     }
 
@@ -134,5 +145,48 @@ export async function listenForSharedFiles(
     } catch (error) {
         console.error('Failed to setup share intent listener:', error);
         return () => { };
+    }
+}
+
+/**
+ * Open native file picker (Android/iOS/Desktop)
+ * Returns the file as a Blob (ready for processing)
+ */
+export async function selectAudioFile(): Promise<Blob | null> {
+    if (!isTauri) {
+        throw new Error('Native file picker not available on web');
+    }
+
+    try {
+        const { open } = await import('@tauri-apps/plugin-dialog');
+        const { readFile } = await import('@tauri-apps/plugin-fs');
+
+        const selected = await open({
+            multiple: false,
+            filters: [{
+                name: 'Audio',
+                extensions: ['wav', 'mp3', 'm4a', 'aac', 'ogg', 'opus']
+            }]
+        });
+
+        if (!selected) return null;
+
+        // On mobile 'selected' is likely a path string
+        const path = selected as string;
+
+        // Read file contents
+        const contents = await readFile(path);
+
+        // Guess MIME type (basic)
+        let mimeType = 'audio/wav';
+        if (path.endsWith('.mp3')) mimeType = 'audio/mpeg';
+        if (path.endsWith('.m4a')) mimeType = 'audio/mp4';
+        if (path.endsWith('.ogg')) mimeType = 'audio/ogg';
+
+        return new Blob([contents], { type: mimeType });
+
+    } catch (error) {
+        console.error('Failed to pick file:', error);
+        return null;
     }
 }
