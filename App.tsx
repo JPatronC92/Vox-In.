@@ -1,18 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Activity,
-  Database,
-  FileAudio,
-  Terminal,
-  Target,
-  Bot,
-  Mic,
-  Square,
-  Layers,
-  FileSearch,
-  CheckCircle2,
-  Loader2,
-} from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Language } from './types';
 import { isTauriEnvironment, resetApiKey } from './services/tauriService';
 import { translations } from './i18n/translations';
