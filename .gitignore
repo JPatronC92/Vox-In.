@@ -6,11 +6,21 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.txt
 
+# Build Artifacts
 node_modules
 dist
 dist-ssr
 *.local
+
+# Tauri / Android
+src-tauri/target/
+src-tauri/gen/android/app/build/
+src-tauri/gen/android/.gradle/
+*.apk
+*.idsig
+*.keystore
 
 # Editor directories and files
 .vscode/*

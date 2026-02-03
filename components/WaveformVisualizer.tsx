@@ -6,10 +6,11 @@ interface Props {
   active: boolean;
   audioUrl: string | null;
   duration: number;
+  markers?: number[];
   onSelectionChange?: (start: number, end: number) => void;
 }
 
-const WaveformVisualizer: React.FC<Props> = ({ active, audioUrl, duration, onSelectionChange }) => {
+const WaveformVisualizer: React.FC<Props> = ({ active, audioUrl, duration, markers = [], onSelectionChange }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -41,12 +42,12 @@ const WaveformVisualizer: React.FC<Props> = ({ active, audioUrl, duration, onSel
 
       const path = new Path2D();
       const amplitude = active ? 60 : 2;
-      
+
       path.moveTo(0, centerY);
       for (let x = 0; x < width; x += 2) {
-          const noise = active ? (Math.random() - 0.5) * 40 : 0;
-          const y = centerY + Math.sin(x * 0.05 + offset) * amplitude + noise;
-          path.lineTo(x, y);
+        const noise = active ? (Math.random() - 0.5) * 40 : 0;
+        const y = centerY + Math.sin(x * 0.05 + offset) * amplitude + noise;
+        path.lineTo(x, y);
       }
 
       ctx.strokeStyle = active ? '#22c55e' : '#1e293b';
@@ -64,13 +65,28 @@ const WaveformVisualizer: React.FC<Props> = ({ active, audioUrl, duration, onSel
         ctx.setLineDash([]);
       }
 
+      // Draw Splice Markers
+      if (markers && markers.length > 0 && duration > 0) {
+        ctx.strokeStyle = '#ef4444'; // rose-500
+        ctx.lineWidth = 2;
+        ctx.setLineDash([2, 2]);
+        markers.forEach(ts => {
+          const x = (ts / duration) * width;
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
+      }
+
       if (active) offset += 0.2;
       animationId = requestAnimationFrame(draw);
     };
 
     draw();
     return () => cancelAnimationFrame(animationId);
-  }, [active, selection, duration]);
+  }, [active, selection, duration, markers]);
 
   const handleStart = (clientX: number) => {
     if (!canvasRef.current || duration <= 0) return;
@@ -95,10 +111,10 @@ const WaveformVisualizer: React.FC<Props> = ({ active, audioUrl, duration, onSel
 
   return (
     <div className="w-full h-full relative group">
-      <canvas 
-        ref={canvasRef} 
-        width={600} 
-        height={300} 
+      <canvas
+        ref={canvasRef}
+        width={600}
+        height={300}
         className="w-full h-full touch-none"
         onMouseDown={(e) => handleStart(e.clientX)}
         onMouseMove={(e) => handleMove(e.clientX)}
@@ -108,8 +124,8 @@ const WaveformVisualizer: React.FC<Props> = ({ active, audioUrl, duration, onSel
         onTouchEnd={() => setIsDragging(false)}
       />
       {selection && (
-        <button 
-          onClick={() => { setSelection(null); if (onSelectionChange) onSelectionChange(0, 0); }} 
+        <button
+          onClick={() => { setSelection(null); if (onSelectionChange) onSelectionChange(0, 0); }}
           className="absolute top-4 right-4 p-2 bg-slate-900 border border-slate-700 rounded-lg text-rose-500 shadow-2xl"
         >
           <Trash2 size={16} />

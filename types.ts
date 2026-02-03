@@ -42,3 +42,20 @@ export interface ForensicReport {
 }
 
 export type AnalysisStatus = 'INACTIVO' | 'CARGANDO' | 'ESCANEO' | 'DECODIFICACION' | 'ANALIZANDO' | 'COMPLETADO' | 'ERROR';
+
+export interface AudioMetadata {
+  duration_seconds: number;
+  sample_rate: number;
+  channels: number;
+  bits_per_sample: number;
+  file_hash: string;
+}
+
+export interface LocalAnalysis {
+  metadata: AudioMetadata;
+  rms_level: number;
+  peak_amplitude: number;
+  silence_ratio: number;
+  splice_timestamps: number[];
+  waveform_data: number[];
+}
