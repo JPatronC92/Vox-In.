@@ -57,28 +57,28 @@ const PlaybackControls: React.FC<Props> = ({ audioRef, isPlaying, setIsPlaying, 
   return (
     <div className="mt-2 p-3 bg-slate-900/70 border border-slate-800 rounded-lg" aria-label="Controles de reproducción de audio">
       <div className="flex items-center gap-4">
-        <button 
+        <button
           type="button"
-          onClick={togglePlay} 
-          className="p-3 bg-green-600/20 hover:bg-green-600/40 border border-green-500/30 rounded-full text-green-300 transition-all focus:ring-2 focus:ring-green-500 focus:outline-none shadow-lg shadow-green-900/50"
+          onClick={togglePlay}
+          className="p-4 bg-green-600/20 hover:bg-green-600/40 border border-green-500/30 rounded-full text-green-300 transition-all focus:ring-2 focus:ring-green-500 focus:outline-none shadow-lg shadow-green-900/50"
           aria-label={isPlaying ? "Pausar audio" : "Reproducir audio"}
         >
           {isPlaying ? <Pause className="w-5 h-5" aria-hidden="true" /> : <Play className="w-5 h-5 fill-green-300" aria-hidden="true" />}
         </button>
         <div className="flex-grow flex items-center gap-3">
-            <span className="text-xs font-mono text-slate-400" aria-hidden="true">{formatTime(currentTime)}</span>
-            <input 
-              type="range" 
-              min="0" 
-              max={duration || 0} 
-              step="0.1" 
-              value={currentTime} 
-              onChange={handleSeek} 
-              className="w-full h-1.5 accent-green-500 bg-slate-800 rounded-full appearance-none cursor-pointer focus:ring-2 focus:ring-green-500"
-              aria-label="Barra de búsqueda de tiempo en el audio"
-              aria-valuetext={`${formatTime(currentTime)} de ${formatTime(duration)}`}
-            />
-            <span className="text-xs font-mono text-slate-500" aria-hidden="true">{formatTime(duration)}</span>
+          <span className="text-sm font-mono text-slate-400" aria-hidden="true">{formatTime(currentTime)}</span>
+          <input
+            type="range"
+            min="0"
+            max={duration || 0}
+            step="0.1"
+            value={currentTime}
+            onChange={handleSeek}
+            className="w-full h-1.5 accent-green-500 bg-slate-800 rounded-full appearance-none cursor-pointer focus:ring-2 focus:ring-green-500"
+            aria-label="Barra de búsqueda de tiempo en el audio"
+            aria-valuetext={`${formatTime(currentTime)} de ${formatTime(duration)}`}
+          />
+          <span className="text-sm font-mono text-slate-500" aria-hidden="true">{formatTime(duration)}</span>
         </div>
       </div>
     </div>

@@ -126,7 +126,7 @@ const WaveformVisualizer: React.FC<Props> = ({ active, audioUrl, duration, marke
       {selection && (
         <button
           onClick={() => { setSelection(null); if (onSelectionChange) onSelectionChange(0, 0); }}
-          className="absolute top-4 right-4 p-2 bg-slate-900 border border-slate-700 rounded-lg text-rose-500 shadow-2xl"
+          className="absolute top-4 right-4 p-3 bg-slate-900 border border-slate-700 rounded-lg text-rose-500 shadow-2xl"
         >
           <Trash2 size={16} />
         </button>

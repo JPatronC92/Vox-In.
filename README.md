@@ -27,6 +27,9 @@ npm install
 # Ejecutar en modo desarrollo
 npx tauri dev
 
+# Ejecutar tests
+npm test
+
 # Compilar para producción
 npx tauri build
 ```

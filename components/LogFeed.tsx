@@ -15,9 +15,9 @@ const LogFeed: React.FC<Props> = ({ logs }) => {
   }, [logs]);
 
   return (
-    <div 
+    <div
       ref={scrollRef}
-      className="h-full overflow-y-auto font-mono text-[9px] space-y-1 pr-2 scroll-smooth"
+      className="h-full overflow-y-auto font-mono text-xs space-y-1 pr-2 scroll-smooth"
       role="log"
       aria-live="polite"
       aria-atomic="false"
@@ -29,13 +29,12 @@ const LogFeed: React.FC<Props> = ({ logs }) => {
       {logs.map((log, i) => {
         const isError = log.includes("!! ERROR:");
         return (
-          <div 
-            key={i} 
-            className={`${
-              isError 
-                ? 'text-rose-500 font-bold border-rose-900/50' 
+          <div
+            key={i}
+            className={`${isError
+                ? 'text-rose-500 font-bold border-rose-900/50'
                 : (i === 0 ? 'text-green-400' : 'text-slate-500')
-            } border-l border-slate-800 pl-2 leading-tight`}
+              } border-l border-slate-800 pl-2 leading-tight`}
           >
             {log}
           </div>

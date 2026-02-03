@@ -26,25 +26,25 @@ const AnalysisCard: React.FC<Props> = ({ icon, title, data, color }) => {
   const currentStyle = styles[color];
 
   return (
-    <section 
+    <section
       className={`relative rounded-3xl p-6 border ${currentStyle.border} ${currentStyle.bg} transition-all duration-500 hover:shadow-2xl hover:-translate-y-1`}
     >
       <div className="flex items-center gap-3 mb-5">
         <div className={`p-2 rounded-lg bg-deep-950/50 ${currentStyle.icon}`}>
           {React.cloneElement(icon as React.ReactElement, { size: 18 })}
         </div>
-        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">
           {title}
         </h3>
       </div>
-      
+
       <dl className="space-y-4">
         {data.map((item, idx) => (
           <div key={idx} className="flex flex-col gap-1 border-l-2 border-white/5 pl-3">
-            <dt className="text-[9px] text-slate-500 font-black uppercase tracking-wider">
+            <dt className="text-xs text-slate-500 font-black uppercase tracking-wider">
               {item.label}
             </dt>
-            <dd className="text-xs text-white font-semibold tracking-tight">
+            <dd className="text-sm text-white font-semibold tracking-tight">
               {item.value}
             </dd>
           </div>

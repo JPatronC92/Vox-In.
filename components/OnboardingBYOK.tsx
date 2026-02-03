@@ -107,14 +107,14 @@ export const OnboardingBYOK: React.FC<OnboardingProps> = ({ onComplete, language
                 <div className="enterprise-panel rounded-2xl p-6 space-y-6">
                     {/* API Key Input */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-300">{t.inputLabel}</label>
+                        <label className="text-base font-medium text-slate-300">{t.inputLabel}</label>
                         <div className="relative">
                             <input
                                 type={showKey ? 'text' : 'password'}
                                 value={apiKey}
                                 onChange={(e) => setApiKey(e.target.value)}
                                 placeholder={t.inputPlaceholder}
-                                className="w-full bg-deep-900 border border-slate-700 rounded-xl px-4 py-3 pr-12 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 font-mono text-sm"
+                                className="w-full bg-deep-900 border border-slate-700 rounded-xl px-4 py-3 pr-12 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 font-mono text-base"
                                 disabled={status === 'verifying' || status === 'success'}
                             />
                             <button
@@ -132,7 +132,7 @@ export const OnboardingBYOK: React.FC<OnboardingProps> = ({ onComplete, language
                         href="https://aistudio.google.com/app/apikey"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-brand-500 hover:text-brand-400 text-sm font-medium"
+                        className="flex items-center gap-2 text-brand-500 hover:text-brand-400 text-base font-medium"
                     >
                         <ExternalLink className="w-4 h-4" />
                         {t.getKeyLink}

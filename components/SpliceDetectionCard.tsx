@@ -40,8 +40,8 @@ const SpliceDetectionCard: React.FC<Props> = ({ cutsDetected, timestamps, lang, 
                         <Scissors size={20} className={hasEdits ? 'text-amber-400' : 'text-brand-500'} />
                     </div>
                     <div>
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">{t.title}</h3>
-                        <p className={`text-sm font-bold ${hasEdits ? 'text-amber-400' : 'text-brand-500'}`}>
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-slate-300">{t.title}</h3>
+                        <p className={`text-xl font-bold ${hasEdits ? 'text-amber-400' : 'text-brand-500'}`}>
                             {hasEdits ? `${cutsDetected} ${t.cutsFound}` : t.noCuts}
                         </p>
                     </div>
@@ -60,7 +60,7 @@ const SpliceDetectionCard: React.FC<Props> = ({ cutsDetected, timestamps, lang, 
                             <button
                                 key={idx}
                                 onClick={() => onSeek?.(ts)}
-                                className="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 rounded-full text-[10px] font-mono transition-colors cursor-pointer border border-transparent hover:border-amber-500/30"
+                                className="px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 rounded-full text-xs font-mono transition-colors cursor-pointer border border-transparent hover:border-amber-500/30"
                                 title="Jump to timestamp"
                             >
                                 {ts.toFixed(2)}s

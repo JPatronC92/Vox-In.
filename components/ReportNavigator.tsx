@@ -18,21 +18,21 @@ const ReportNavigator: React.FC<Props> = ({ sections }) => {
     const element = document.getElementById(id);
     if (element) {
       let parentScroller = element.closest('.overflow-y-auto');
-      
+
       if (parentScroller) {
-          const elementRect = element.getBoundingClientRect();
-          const parentRect = parentScroller.getBoundingClientRect();
-          const scrollTop = parentScroller.scrollTop + elementRect.top - parentRect.top;
-          
-          const offset = 24; // A small offset to not stick right at the top
-          
-          parentScroller.scrollTo({
-              top: scrollTop - offset,
-              behavior: 'smooth'
-          });
+        const elementRect = element.getBoundingClientRect();
+        const parentRect = parentScroller.getBoundingClientRect();
+        const scrollTop = parentScroller.scrollTop + elementRect.top - parentRect.top;
+
+        const offset = 24; // A small offset to not stick right at the top
+
+        parentScroller.scrollTo({
+          top: scrollTop - offset,
+          behavior: 'smooth'
+        });
 
       } else {
-         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   };
@@ -42,14 +42,14 @@ const ReportNavigator: React.FC<Props> = ({ sections }) => {
       <ul className="flex items-center justify-around gap-1">
         {sections.map(({ id, label, icon }) => (
           <li key={id} className="flex-1 text-center">
-            <a 
-              href={`#${id}`} 
+            <a
+              href={`#${id}`}
               onClick={(e) => handleClick(e, id)}
-              className="flex flex-col items-center gap-1.5 text-slate-400 hover:text-green-300 hover:bg-green-500/10 transition-all group px-1 py-2 rounded-md w-full"
+              className="flex flex-col items-center gap-1.5 text-slate-400 hover:text-green-300 hover:bg-green-500/10 transition-all group px-3 py-3 rounded-md w-full"
               title={label}
             >
               <div className="w-5 h-5" aria-hidden="true">{icon}</div>
-              <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
+              <span className="text-xs font-bold uppercase tracking-wider">{label}</span>
             </a>
           </li>
         ))}

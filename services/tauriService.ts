@@ -150,7 +150,7 @@ export async function selectAudioFile(): Promise<Blob | null> {
             multiple: false,
             filters: [{
                 name: 'Audio',
-                extensions: ['wav', 'mp3', 'm4a', 'aac', 'ogg', 'opus']
+                extensions: ['wav', 'mp3', 'm4a', 'aac', 'ogg', 'opus', 'flac', 'amr', 'wma', 'alac', 'aiff']
             }]
         });
 
@@ -159,19 +159,47 @@ export async function selectAudioFile(): Promise<Blob | null> {
         // On mobile 'selected' is likely a path string
         const path = selected as string;
 
-        // Read file contents
-        const contents = await readFile(path);
-
-        // Guess MIME type (basic)
-        let mimeType = 'audio/wav';
-        if (path.endsWith('.mp3')) mimeType = 'audio/mpeg';
-        if (path.endsWith('.m4a')) mimeType = 'audio/mp4';
-        if (path.endsWith('.ogg')) mimeType = 'audio/ogg';
-
-        return new Blob([contents], { type: mimeType });
+        return await readAudioFile(path);
 
     } catch (error) {
         console.error('Failed to pick file:', error);
+        return null;
+    }
+}
+
+/**
+ * Read audio file from path and return Blob with correct mime type
+ */
+export async function readAudioFile(path: string): Promise<Blob | null> {
+    try {
+        const { readFile } = await import('@tauri-apps/plugin-fs');
+
+        // Handle file:// prefix if present
+        const fsPath = path.startsWith('file://') ? path.slice(7) : path;
+        // On Android file:// is usually not needed for readFile if it expects an absolute path, 
+        // but often URIs are used. tauri-plugin-fs expects a path.
+        // But let's be careful. decodeURIComponent is also needed.
+        const cleanPath = decodeURIComponent(fsPath);
+
+        const contents = await readFile(cleanPath);
+
+        // Guess MIME type (basic)
+        let mimeType = 'audio/wav';
+        const lowerPath = cleanPath.toLowerCase();
+        if (lowerPath.endsWith('.mp3')) mimeType = 'audio/mpeg';
+        if (lowerPath.endsWith('.m4a')) mimeType = 'audio/mp4';
+        if (lowerPath.endsWith('.ogg')) mimeType = 'audio/ogg';
+        if (lowerPath.endsWith('.opus')) mimeType = 'audio/ogg';
+        if (lowerPath.endsWith('.flac')) mimeType = 'audio/flac';
+        if (lowerPath.endsWith('.amr')) mimeType = 'audio/amr';
+        if (lowerPath.endsWith('.wma')) mimeType = 'audio/x-ms-wma';
+        if (lowerPath.endsWith('.aac')) mimeType = 'audio/aac';
+        if (lowerPath.endsWith('.alac')) mimeType = 'audio/alac';
+        if (lowerPath.endsWith('.aiff')) mimeType = 'audio/aiff';
+
+        return new Blob([contents], { type: mimeType });
+    } catch (error) {
+        console.error('Failed to read audio file:', error);
         return null;
     }
 }

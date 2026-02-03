@@ -26,7 +26,7 @@ const Spectrogram: React.FC<Props> = ({ active, editPoints, duration = 0, lang =
   const [offsetX, setOffsetX] = useState(0);
   const [isPanning, setIsPanning] = useState(false);
   const [hoverData, setHoverData] = useState<{ x: number, y: number, freq: number, time: number } | null>(null);
-  
+
   const lastMousePos = useRef<{ x: number, y: number } | null>(null);
 
   const t = {
@@ -41,7 +41,7 @@ const Spectrogram: React.FC<Props> = ({ active, editPoints, duration = 0, lang =
     if (!ctx) return;
 
     let animationId: number;
-    
+
     const draw = () => {
       const width = canvas.width;
       const height = canvas.height;
@@ -72,7 +72,7 @@ const Spectrogram: React.FC<Props> = ({ active, editPoints, duration = 0, lang =
         for (let x = 0; x < width; x += 8 / zoom) {
           const pseudoNoise = Math.sin(x * 0.02) * 0.5 + 0.5;
           for (let y = 0; y < height; y += 8) {
-            const intensity = (Math.random() * 0.2) + (pseudoNoise * 0.3 * (1 - y/height));
+            const intensity = (Math.random() * 0.2) + (pseudoNoise * 0.3 * (1 - y / height));
             ctx.fillStyle = getColorForIntensity(intensity);
             ctx.fillRect(x * zoom, y, 8 * zoom, 8);
           }
@@ -91,7 +91,7 @@ const Spectrogram: React.FC<Props> = ({ active, editPoints, duration = 0, lang =
 
       // Marcas de Tiempo e Información de auditoría (Eje Y = Frecuencia)
       ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.font = '8px JetBrains Mono';
+      ctx.font = '11px JetBrains Mono';
       for (let i = 0; i <= 5; i++) {
         const freqLabel = `${(8000 - (i * 1600))} Hz`;
         ctx.fillText(freqLabel, 5, (height / 5) * i + 10);
@@ -109,7 +109,7 @@ const Spectrogram: React.FC<Props> = ({ active, editPoints, duration = 0, lang =
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = Math.max(1, Math.min(zoom * delta, 20));
     setZoom(newZoom);
-    
+
     // Ajustar offset para que el zoom sea hacia el cursor
     if (newZoom === 1) setOffsetX(0);
   };
@@ -151,11 +151,11 @@ const Spectrogram: React.FC<Props> = ({ active, editPoints, duration = 0, lang =
 
   return (
     <div className="w-full h-full bg-slate-950 relative overflow-hidden group cursor-crosshair select-none">
-      <canvas 
-        ref={canvasRef} 
-        width={800} 
-        height={300} 
-        className="w-full h-full opacity-90 transition-opacity" 
+      <canvas
+        ref={canvasRef}
+        width={800}
+        height={300}
+        className="w-full h-full opacity-90 transition-opacity"
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -165,21 +165,21 @@ const Spectrogram: React.FC<Props> = ({ active, editPoints, duration = 0, lang =
 
       {/* TOOLTIP DINÁMICO */}
       {hoverData && (
-        <div 
+        <div
           className="absolute pointer-events-none z-30 bg-deep-950/90 border border-brand-500/30 p-2 rounded-lg shadow-2xl backdrop-blur-md"
-          style={{ 
-            left: Math.min(hoverData.x + 15, 600), 
-            top: Math.min(hoverData.y + 15, 220) 
+          style={{
+            left: Math.min(hoverData.x + 15, 600),
+            top: Math.min(hoverData.y + 15, 220)
           }}
         >
           <div className="flex flex-col gap-1">
             <div className="flex justify-between gap-4">
-              <span className="text-[8px] font-black text-slate-500 uppercase">{t.freq}</span>
-              <span className="text-[9px] font-mono text-brand-500">{hoverData.freq} Hz</span>
+              <span className="text-xs font-black text-slate-500 uppercase">{t.freq}</span>
+              <span className="text-sm font-mono text-brand-500">{hoverData.freq} Hz</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-[8px] font-black text-slate-500 uppercase">{t.time}</span>
-              <span className="text-[9px] font-mono text-white">{hoverData.time.toFixed(3)}s</span>
+              <span className="text-xs font-black text-slate-500 uppercase">{t.time}</span>
+              <span className="text-sm font-mono text-white">{hoverData.time.toFixed(3)}s</span>
             </div>
           </div>
         </div>
@@ -188,16 +188,16 @@ const Spectrogram: React.FC<Props> = ({ active, editPoints, duration = 0, lang =
       {/* CONTROLES DE INTERACCIÓN */}
       <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <div className="bg-deep-950/80 border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-3 shadow-xl">
-           <div className="flex items-center gap-1.5 border-r border-white/10 pr-3">
-             <ZoomIn size={12} className="text-brand-500" />
-             <span className="text-[10px] font-mono font-bold text-white">x{zoom.toFixed(1)}</span>
-           </div>
-           <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest hidden md:block">
-             {t.hint}
-           </span>
-           <div className="flex gap-1">
-             <Move size={12} className={isPanning ? 'text-brand-500' : 'text-slate-600'} />
-           </div>
+          <div className="flex items-center gap-1.5 border-r border-white/10 pr-3">
+            <ZoomIn size={12} className="text-brand-500" />
+            <span className="text-xs font-mono font-bold text-white">x{zoom.toFixed(1)}</span>
+          </div>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-widest hidden md:block">
+            {t.hint}
+          </span>
+          <div className="flex gap-1">
+            <Move size={12} className={isPanning ? 'text-brand-500' : 'text-slate-600'} />
+          </div>
         </div>
       </div>
 

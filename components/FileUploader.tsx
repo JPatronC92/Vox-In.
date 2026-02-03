@@ -28,8 +28,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ isTauri, onFileSelected, la
                 <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mb-3">
                     <Upload size={24} />
                 </div>
-                <span className="text-[10px] font-extrabold uppercase tracking-widest">{label}</span>
-                <span className="text-[8px] text-slate-500 mt-1">WAV, MP3, M4A</span>
+                <span className="text-sm font-extrabold uppercase tracking-widest">{label}</span>
+                <span className="text-xs text-slate-500 mt-1">
+                    WAV, MP3, M4A, OGG, FLAC, AMR, AAC, OPUS, WMA, ALAC, AIFF
+                </span>
             </div>
 
             <input

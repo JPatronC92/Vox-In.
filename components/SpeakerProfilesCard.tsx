@@ -62,10 +62,10 @@ const SpeakerProfilesCard: React.FC<Props> = ({ speakers, speakerCount, lang }) 
     return (
         <section className="enterprise-panel rounded-3xl overflow-hidden">
             <div className="p-5 border-b border-white/5 flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300 flex items-center gap-2">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-slate-300 flex items-center gap-2">
                     <Users size={16} className="text-indigo-400" /> {t.title}
                 </h3>
-                <span className="text-[10px] font-mono text-brand-500">{speakerCount} {t.detected}</span>
+                <span className="text-xs font-mono text-brand-500">{speakerCount} {t.detected}</span>
             </div>
 
             <div className="p-4 space-y-3">
@@ -73,34 +73,34 @@ const SpeakerProfilesCard: React.FC<Props> = ({ speakers, speakerCount, lang }) 
                     <div key={speaker.id} className="p-4 bg-deep-950/60 rounded-2xl border border-white/5">
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-500 font-bold text-sm">
+                                <div className="w-8 h-8 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-500 font-bold text-base">
                                     {speaker.id}
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-white">{t.speaker} {speaker.id}</p>
-                                    <p className="text-[10px] text-slate-500 flex items-center gap-1">
+                                    <p className="text-base font-bold text-white">{t.speaker} {speaker.id}</p>
+                                    <p className="text-xs text-slate-500 flex items-center gap-1">
                                         {getDetectionIcon(speaker.detectedVia)} {t[speaker.detectedVia as keyof typeof t] || speaker.detectedVia}
                                     </p>
                                 </div>
                             </div>
-                            <div className={`px-2 py-1 rounded-full text-[9px] font-bold uppercase ${emotionColors[speaker.emotionalState] || emotionColors.neutral}`}>
+                            <div className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${emotionColors[speaker.emotionalState] || emotionColors.neutral}`}>
                                 {speaker.emotionalState}
                             </div>
                         </div>
 
                         <div className="grid grid-cols-3 gap-2 text-center">
                             <div className="p-2 bg-white/5 rounded-lg">
-                                <p className="text-[9px] text-slate-500 uppercase">{t.age}</p>
-                                <p className="text-sm font-bold text-white">{speaker.ageEstimate}</p>
+                                <p className="text-xs text-slate-500 uppercase">{t.age}</p>
+                                <p className="text-base font-bold text-white">{speaker.ageEstimate}</p>
                             </div>
                             <div className="p-2 bg-white/5 rounded-lg">
-                                <p className="text-[9px] text-slate-500 uppercase">{t.gender}</p>
-                                <p className="text-sm font-bold text-white">{speaker.gender}</p>
+                                <p className="text-xs text-slate-500 uppercase">{t.gender}</p>
+                                <p className="text-base font-bold text-white">{speaker.gender}</p>
                             </div>
                             <div className="p-2 bg-white/5 rounded-lg">
-                                <p className="text-[9px] text-slate-500 uppercase">{t.stress}</p>
+                                <p className="text-xs text-slate-500 uppercase">{t.stress}</p>
                                 <div className="flex items-center justify-center gap-1">
-                                    <p className={`text-sm font-bold ${speaker.stressLevel > 70 ? 'text-rose-400' : speaker.stressLevel > 40 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                    <p className={`text-base font-bold ${speaker.stressLevel > 70 ? 'text-rose-400' : speaker.stressLevel > 40 ? 'text-amber-400' : 'text-emerald-400'}`}>
                                         {speaker.stressLevel}%
                                     </p>
                                 </div>

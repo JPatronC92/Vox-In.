@@ -13,8 +13,8 @@ interface Props {
 }
 
 const formatTime = (time: number) => {
-    if (isNaN(time) || time === Infinity) return '0.00s';
-    return `${time.toFixed(2)}s`;
+  if (isNaN(time) || time === Infinity) return '0.00s';
+  return `${time.toFixed(2)}s`;
 };
 
 const MetadataCard: React.FC<Props> = ({ duration, mimeType, fileHash, lang }) => {
@@ -26,11 +26,11 @@ const MetadataCard: React.FC<Props> = ({ duration, mimeType, fileHash, lang }) =
   return (
     <section className="enterprise-panel rounded-2xl p-1 overflow-hidden">
       <div className="bg-slate-900/30 p-5">
-        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-            <Binary className="w-4 h-4 text-brand-500" />
-            {t.title}
+        <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+          <Binary className="w-4 h-4 text-brand-500" />
+          {t.title}
         </h3>
-        <dl className="space-y-3 text-xs">
+        <dl className="space-y-3 text-sm">
           <div className="flex justify-between border-b border-white/5 pb-2">
             <dt className="text-slate-500 font-medium">{t.dur}</dt>
             <dd className="font-mono text-white">{formatTime(duration)}</dd>
