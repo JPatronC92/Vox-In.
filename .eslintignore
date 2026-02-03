@@ -1,0 +1,7 @@
+node_modules
+dist
+src-tauri
+.github
+*.config.js
+*.config.ts
+scripts

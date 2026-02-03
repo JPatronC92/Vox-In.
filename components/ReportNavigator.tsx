@@ -17,7 +17,7 @@ const ReportNavigator: React.FC<Props> = ({ sections }) => {
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
-      let parentScroller = element.closest('.overflow-y-auto');
+      const parentScroller = element.closest('.overflow-y-auto');
 
       if (parentScroller) {
         const elementRect = element.getBoundingClientRect();

@@ -13,6 +13,13 @@ val tauriProperties = Properties().apply {
     }
 }
 
+val localProperties = Properties().apply {
+    val localPropFile = rootProject.file("local.properties")
+    if (localPropFile.exists()) {
+        localPropFile.inputStream().use { load(it) }
+    }
+}
+
 android {
     compileSdk = 36
     namespace = "com.voxintelligence.pro"
@@ -24,6 +31,25 @@ android {
         versionCode = tauriProperties.getProperty("tauri.android.versionCode", "1").toInt()
         versionName = tauriProperties.getProperty("tauri.android.versionName", "1.0")
     }
+
+    signingConfigs {
+        create("release") {
+            val envKeyStorePath = System.getenv("ANDROID_KEYSTORE_PATH") ?: localProperties.getProperty("storeFile")
+            val envKeyStorePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: localProperties.getProperty("storePassword")
+            val envKeyAlias = System.getenv("ANDROID_KEY_ALIAS") ?: localProperties.getProperty("keyAlias")
+            val envKeyPassword = System.getenv("ANDROID_KEY_PASSWORD") ?: localProperties.getProperty("keyPassword")
+
+            if (envKeyStorePath != null && envKeyStorePassword != null && envKeyAlias != null && envKeyPassword != null) {
+                storeFile = file(envKeyStorePath)
+                storePassword = envKeyStorePassword
+                keyAlias = envKeyAlias
+                keyPassword = envKeyPassword
+            } else {
+                println("Release signing config not found. Verify env vars or local.properties.")
+            }
+        }
+    }
+
     buildTypes {
         getByName("debug") {
             manifestPlaceholders["usesCleartextTraffic"] = "true"
@@ -38,6 +64,7 @@ android {
         }
         getByName("release") {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 *fileTree(".") { include("**/*.pro") }
                     .plus(getDefaultProguardFile("proguard-android-optimize.txt"))
