@@ -6,6 +6,7 @@ interface Props {
     cutsDetected: number;
     timestamps: number[];
     lang: Language;
+    onSeek?: (seconds: number) => void;
 }
 
 const translations = {
@@ -27,7 +28,7 @@ const translations = {
     }
 };
 
-const SpliceDetectionCard: React.FC<Props> = ({ cutsDetected, timestamps, lang }) => {
+const SpliceDetectionCard: React.FC<Props> = ({ cutsDetected, timestamps, lang, onSeek }) => {
     const t = translations[lang];
     const hasEdits = cutsDetected > 0;
 
@@ -56,9 +57,14 @@ const SpliceDetectionCard: React.FC<Props> = ({ cutsDetected, timestamps, lang }
                 <div className="px-4 pb-4">
                     <div className="flex flex-wrap gap-2">
                         {timestamps.map((ts, idx) => (
-                            <span key={idx} className="px-2 py-1 bg-amber-500/10 text-amber-400 rounded-full text-[10px] font-mono">
+                            <button
+                                key={idx}
+                                onClick={() => onSeek?.(ts)}
+                                className="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 rounded-full text-[10px] font-mono transition-colors cursor-pointer border border-transparent hover:border-amber-500/30"
+                                title="Jump to timestamp"
+                            >
                                 {ts.toFixed(2)}s
-                            </span>
+                            </button>
                         ))}
                     </div>
                 </div>

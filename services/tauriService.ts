@@ -3,25 +3,10 @@
  * All Gemini API calls go through secure Rust backend
  */
 
-import { ForensicReport, Language } from '../types';
+import { ForensicReport, Language, LocalAnalysis } from '../types';
 
 // Check if running inside Tauri
 const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
-
-interface LocalAnalysis {
-    metadata: {
-        duration_seconds: number;
-        sample_rate: number;
-        channels: number;
-        bits_per_sample: number;
-        file_hash: string;
-    };
-    rms_level: number;
-    peak_amplitude: number;
-    silence_ratio: number;
-    splice_timestamps: number[];
-    waveform_data: number[];
-}
 
 /**
  * Invoke a Tauri command

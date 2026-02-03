@@ -9,6 +9,7 @@ interface HeaderProps {
     status: AnalysisStatus;
     isTranscribing: boolean;
     onResetApiKey: () => void;
+    isTauri: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -17,7 +18,8 @@ const Header: React.FC<HeaderProps> = ({
     t,
     status,
     isTranscribing,
-    onResetApiKey
+    onResetApiKey,
+    isTauri
 }) => {
     return (
         <header className="px-4 py-3 nav-blur border-b border-white/5 flex items-center justify-between z-50 shrink-0">
@@ -40,7 +42,10 @@ const Header: React.FC<HeaderProps> = ({
 
                 <div className="hidden lg:flex flex-col items-end mr-2">
                     <span className="text-[10px] text-slate-500 font-bold uppercase">{t.systemStatus}</span>
-                    <span className="text-[10px] text-brand-500 font-mono">{t.encrypted}</span>
+                    <span className="text-[10px] text-brand-500 font-mono flex items-center gap-1">
+                        {isTauri && <div className="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></div>}
+                        {isTauri ? "DSP ENGINE: ONLINE" : t.encrypted}
+                    </span>
                 </div>
 
                 <div className="px-2 py-1 rounded-full border border-white/5 bg-white/5 flex items-center gap-2 shrink-0">
