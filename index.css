@@ -8,11 +8,15 @@
   --color-brand-50: #ecfdf5;
   --color-brand-100: #d1fae5;
   --color-brand-500: #10b981;
+  --color-brand-400: #34d399;
   --color-brand-600: #059669;
   --color-brand-900: #064e3b;
 
   --color-deep-900: #0f172a;
   --color-deep-950: #080c14;
+  
+  --color-rose-400: #fb7185;
+  --color-rose-500: #f43f5e;
 }
 
 /* Custom styles */
@@ -29,6 +33,13 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mobile-glass {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .nav-blur {
