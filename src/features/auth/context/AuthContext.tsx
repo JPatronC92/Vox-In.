@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import {
   isTauriEnvironment,
   resetApiKey as resetTauriApiKey,
+  checkApiKey as checkTauriApiKey,
 } from '../../../services/tauriService';
 
 interface AuthContextType {
@@ -21,8 +22,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const checkApiKey = async () => {
       if (isTauri) {
         try {
-          const { invoke } = await import('@tauri-apps/api/core');
-          const key = await invoke<string | null>('get_api_key');
+          const key = await checkTauriApiKey();
           setHasApiKey(!!key);
         } catch {
           setHasApiKey(false);
