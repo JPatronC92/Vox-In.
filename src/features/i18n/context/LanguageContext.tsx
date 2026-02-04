@@ -31,7 +31,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     const initStore = async () => {
       if (isTauriEnvironment()) {
         try {
-          const store = new Store('vox_config.json');
+          const store = new Store('vox_settings.json');
           const saved = await store.get<string>('language');
           if (saved && (saved === 'es' || saved === 'en')) {
             setLangState(saved as Language);
@@ -41,6 +41,8 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
         } finally {
           setIsLoaded(true);
         }
+      } else {
+        setIsLoaded(true);
       }
     };
 
@@ -51,7 +53,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     setLangState(newLang);
     try {
       if (isTauriEnvironment()) {
-        const store = new Store('vox_config.json');
+        const store = new Store('vox_settings.json');
         await store.set('language', newLang);
         await store.save();
       } else {

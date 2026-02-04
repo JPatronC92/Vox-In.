@@ -22,9 +22,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const checkApiKey = async () => {
       if (isTauri) {
         try {
+          // Robust check for API key
           const key = await checkTauriApiKey();
           setHasApiKey(!!key);
-        } catch {
+        } catch (error) {
+          console.error("Failed to check API key in Keychain/Store:", error);
+          // Fallback to false so app doesn't hang in "loading" state
           setHasApiKey(false);
         }
       } else {
@@ -35,7 +38,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const handleResetApiKey = async () => {
-    await resetTauriApiKey();
+    try {
+      await resetTauriApiKey();
+    } catch (error) {
+       console.error("Failed to reset API key:", error);
+    }
     setHasApiKey(false);
     window.location.reload();
   };

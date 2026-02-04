@@ -6,7 +6,7 @@ use std::io::Cursor;
 use tauri::{command, AppHandle};
 use tauri_plugin_store::StoreExt;
 
-const STORE_FILE: &str = "vox_config.json";
+const STORE_FILE: &str = "vox_settings.json";
 const API_KEY_STORE_KEY: &str = "gemini_api_key";
 
 /// Audio metadata extracted by Rust
