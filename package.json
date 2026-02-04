@@ -16,7 +16,8 @@
     "format:frontend": "prettier --write .",
     "format:rust": "cd src-tauri && cargo fmt",
     "format:android": "cd src-tauri/gen/android && ./gradlew ktlintFormat",
-    "format": "npm run format:frontend && npm run format:rust"
+    "format": "npm run format:frontend && npm run format:rust",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
@@ -27,7 +28,8 @@
     "@tauri-apps/plugin-store": "^2.4.2",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.9.6",
@@ -42,12 +44,21 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.0",
+    "husky": "^8.0.0",
     "jsdom": "^28.0.0",
+    "lint-staged": "^16.2.7",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.1.18",
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
     "vitest": "^4.0.18"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

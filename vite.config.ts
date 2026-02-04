@@ -13,12 +13,12 @@ export default defineConfig({
   // API_KEY is no longer exposed - all Gemini calls go through Rust backend
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '.'),
+      '@': path.resolve(__dirname, './src'),
     }
   },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './setupTests.ts',
+    setupFiles: './src/setupTests.ts',
   },
 });
