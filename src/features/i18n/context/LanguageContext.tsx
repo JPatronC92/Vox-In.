@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Store } from '@tauri-apps/plugin-store';
+import { load } from '@tauri-apps/plugin-store';
 import { Language } from '../../../types';
 import { translations } from '../../../i18n/translations';
 import { isTauriEnvironment } from '../../../services/tauriService';
@@ -31,7 +31,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     const initStore = async () => {
       if (isTauriEnvironment()) {
         try {
-          const store = new Store('vox_settings.json');
+          const store = await load('vox_settings.json');
           const saved = await store.get<string>('language');
           if (saved && (saved === 'es' || saved === 'en')) {
             setLangState(saved as Language);
@@ -53,7 +53,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     setLangState(newLang);
     try {
       if (isTauriEnvironment()) {
-        const store = new Store('vox_settings.json');
+        const store = await load('vox_settings.json');
         await store.set('language', newLang);
         await store.save();
       } else {
