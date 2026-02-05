@@ -6,7 +6,7 @@ use std::io::Cursor;
 use tauri::{command, AppHandle};
 use tauri_plugin_store::StoreExt;
 
-const STORE_FILE: &str = "vox_config.json";
+const STORE_FILE: &str = "vox_settings.json";
 const API_KEY_STORE_KEY: &str = "gemini_api_key";
 
 /// Audio metadata extracted by Rust
@@ -32,79 +32,63 @@ pub struct LocalAnalysis {
 
 /// Speaker profile from Gemini analysis
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Speaker {
     pub id: i32,
-    #[serde(rename = "ageEstimate")]
     pub age_estimate: String,
     pub gender: String,
-    #[serde(rename = "emotionalState")]
     pub emotional_state: String,
-    #[serde(rename = "stressLevel")]
     pub stress_level: i32,
-    #[serde(rename = "speakingDuration")]
     pub speaking_duration: Option<f32>,
-    #[serde(rename = "detectedVia")]
     pub detected_via: String,
 }
 
 /// Environment profile
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct EnvironmentProfile {
-    #[serde(rename = "roomType")]
     pub room_type: String,
-    #[serde(rename = "environmentalMarkers")]
     pub environmental_markers: Vec<String>,
 }
 
 /// Splice detection results
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SpliceDetection {
-    #[serde(rename = "cutsDetected")]
     pub cuts_detected: i32,
     pub timestamps: Vec<f32>,
 }
 
 /// Anomaly detection results
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AnomalyDetection {
-    #[serde(rename = "overallScore")]
     pub overall_score: i32,
-    #[serde(rename = "riskLevel")]
     pub risk_level: String,
-    #[serde(rename = "technicalFlags")]
     pub technical_flags: Vec<String>,
-    #[serde(rename = "prosodicFlags")]
     pub prosodic_flags: Vec<String>,
-    #[serde(rename = "emotionalFlags")]
     pub emotional_flags: Vec<String>,
-    #[serde(rename = "environmentalFlags")]
     pub environmental_flags: Vec<String>,
-    #[serde(rename = "spliceDetection")]
     pub splice_detection: SpliceDetection,
 }
 
 /// Deepfake detection results
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DeepfakeDetection {
-    #[serde(rename = "isDeepfake")]
     pub is_deepfake: bool,
-    #[serde(rename = "confidenceScore")]
     pub confidence_score: i32,
-    #[serde(rename = "detectionFlags")]
     pub detection_flags: Vec<String>,
 }
 
 /// Complete forensic report matching TypeScript interface
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ForensicReport {
-    #[serde(rename = "speakerCount")]
     pub speaker_count: i32,
     pub speakers: Vec<Speaker>,
-    #[serde(rename = "environmentProfile")]
     pub environment_profile: EnvironmentProfile,
-    #[serde(rename = "anomalyDetection")]
     pub anomaly_detection: AnomalyDetection,
-    #[serde(rename = "deepfakeDetection")]
     pub deepfake_detection: DeepfakeDetection,
     pub transcription: String,
     pub summary: String,

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use tauri::command;
 
 const API_KEY_STORE_KEY: &str = "gemini_api_key";
-const STORE_FILE: &str = "vox_config.json";
+const STORE_FILE: &str = "vox_settings.json";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiKeyValidation {
